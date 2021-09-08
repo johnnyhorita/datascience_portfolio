@@ -3,25 +3,19 @@
 
 # Bibliotecas
 import time
-import plotly
 import pandas as pd
 import numpy as np
 
-import mplfinance as fplt
 import cufflinks as cf
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 from pandas_datareader.data import DataReader
 from pandas_datareader.nasdaq_trader import get_nasdaq_symbols
 
 import datetime as dt
 import streamlit as st
-from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 
 from fbprophet import Prophet
 from fbprophet.plot import plot_plotly
@@ -35,10 +29,10 @@ cf.go_offline()
 
 
 # Parametrizações ##################################################
-sns.set_style('whitegrid')
-plt.style.use("fivethirtyeight")
+#sns.set_style('whitegrid')
+#plt.style.use("fivethirtyeight")
 st.set_option('deprecation.showPyplotGlobalUse', False)
-plt.rcParams['axes.facecolor'] = 'white'
+#plt.rcParams['axes.facecolor'] = 'white'
 
 # Funções #########################################################
 #@st.cache
@@ -241,11 +235,12 @@ if run_button:
         fig_forecast = plot_plotly(m, forecast)
         st.plotly_chart(fig_forecast)
        
-        st.subheader(f'Explaining the characteristics of the forecast model')
-        fig_components = m.plot_components(forecast)
-        st.write(fig_components)
+        #st.subheader(f'Explaining the characteristics of the forecast model')
+        #fig_components = m.plot_components(forecast)
+        #st.write(fig_components)
     
-    data_load_state.text('Information successfully created!')    
+    #data_load_state.text('Information successfully created!')    
+    data_load_state.text('')
     load_state.text('')
 
 

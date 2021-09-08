@@ -1,0 +1,4 @@
+streamlit==0.82.0
+ply==3.11
+pandas-profiling==3.0.0
+cufflinks==0.17.3
