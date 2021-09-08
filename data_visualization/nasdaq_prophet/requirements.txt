@@ -3,3 +3,4 @@ ply==3.11
 pandas-profiling==3.0.0
 cufflinks==0.17.3
 pandas-datareader==0.10.0
+fbprophet==0.7.1
