@@ -2,7 +2,6 @@
 #'Previsão do preço de ações (NASDAQ)'
 
 # Bibliotecas
-import io, os, sys, setuptools, tokenize
 import time
 import pandas as pd
 import numpy as np
@@ -71,7 +70,7 @@ def plot_bar(df, company_name):
     fig = px.bar(dfbar, 
                  x=dfbar.index, 
                  y=dfbar.values, 
-                 title = f'{company_name} - Valor Médio do preço fechamento no ano',
+                 title = f'{company_name} - Average Value',
                  labels={'x':'Year','y':'Price'}                 
                 )
     st.plotly_chart(fig)
@@ -180,67 +179,102 @@ run_button = st.sidebar.button(label='Execute')
 st.title(project_title)
 
 if run_button:
-    # Define a data final para o periodo de download das ações
-    dt_end = dt.datetime.now().date()
+    if len(acao_list) == 0:
+        data_load_state = st.text('Please select stocks...')
+    else:
+        # Define a data final para o periodo de download das ações
+        dt_end = dt.datetime.now().date()
 
-    # Verifica se a data inicial da previsão é compatível, deve ter pelo menos 1 ano para efetuar a previsão
-    # Se a data final for menor ou igual a data inicial a data inicial será decrescida em 1 ano 
-    if dt_end <= dt_start:
-        dt_start = dt.datetime(dt_end.year - 4, dt_end.month, dt_end.day).strftime('%Y-%m-%d')
+        # Verifica se a data inicial da previsão é compatível, deve ter pelo menos 1 ano para efetuar a previsão
+        # Se a data final for menor ou igual a data inicial a data inicial será decrescida em 1 ano 
+        if dt_end <= dt_start:
+            dt_start = dt.datetime(dt_end.year - 4, dt_end.month, dt_end.day).strftime('%Y-%m-%d')
 
-    data_load_state = st.text('Downloading information...')
-    load_state = st.text('')
+        data_load_state = st.text('Downloading information...')
+        load_state = st.text('')
 
-    company_list = list()
-    
-    #Efetuando o download dos dados financeiros yahoo e criando os dataframes
-    df_dict = dict()      
-    for acao in acao_list:
-        load_state.text(f'Download: {acao}')
-        try: 
-            df_dict[acao] = DataReader(acao, 'yahoo', dt_start, dt_end)
-            df_dict[acao]["Year"] = pd.DatetimeIndex(df_dict[acao].index).year
-            df_dict[acao]["Month"] = pd.DatetimeIndex(df_dict[acao].index).month
+        my_bar = st.progress(0)
+        percent_complete = 0
 
-            filtro = symbols["NASDAQ Symbol"]==acao
-            acao_company = symbols.loc[filtro, "Security Name"].values[0]    
-            acao_company = acao_company.split('Common Stock', 1)[0]
-            acao_company = acao_company.split('-', 1)[0]
-            company_list.append(acao_company)
-            load_state.text(f'Information {acao} successfully updated!')
-            
-        except:
-            load_state.text (f'Information {acao} not found!')
+        company_list = list()
 
-    data_load_state.text('Creating graphics')
-    load_state.text('')
+        #Efetuando o download dos dados financeiros yahoo e criando os dataframes
+        df_dict = dict()      
+        for acao in acao_list:
+            load_state.text(f'Download: {acao}')
+            try: 
+                df_dict[acao] = DataReader(acao, 'yahoo', dt_start, dt_end)
+                df_dict[acao]["Year"] = pd.DatetimeIndex(df_dict[acao].index).year
+                df_dict[acao]["Month"] = pd.DatetimeIndex(df_dict[acao].index).month
 
-    for i, acao in enumerate(acao_list, 1):
-        new_title = f'<p style="font-family:sans-serif; color:Green; font-size: 22px;">{acao}</p>'
-        st.markdown(new_title, unsafe_allow_html=True)        
-        st.write()
-        company_name = company_list[i - 1]
+                filtro = symbols["NASDAQ Symbol"]==acao
+                acao_company = symbols.loc[filtro, "Security Name"].values[0]    
+                acao_company = acao_company.split('Common Stock', 1)[0]
+                acao_company = acao_company.split('-', 1)[0]
+                company_list.append(acao_company)
+                load_state.text(f'Information {acao} successfully updated!')
 
-        plot_cufflinks(df_dict[acao], company_name)
-        plot_bubble(acao, company_name)
-        #plot_hist(df_dict[acao], company_name)
-        plot_area(df_dict[acao], company_name)
-        plot_bar(df_dict[acao], company_name)
-        plot_box(df_dict[acao], company_name)
-        #plot_line(df_dict[acao], company_name)        
-        #plot_candlestick(df_dict[acao], acao)
+                percent_complete += 0.2/len(acao_list)
+                my_bar.progress(percent_complete)
 
-        m, forecast = make_forecast(acao, period)
-        st.subheader(f'FB Prophet forecast to {acao} from {period} days')
-        fig_forecast = plot_plotly(m, forecast)
-        st.plotly_chart(fig_forecast)
-       
-        #st.subheader(f'Explaining the characteristics of the forecast model')
-        #fig_components = m.plot_components(forecast)
-        #st.write(fig_components)
-    
-    #data_load_state.text('Information successfully created!')    
-    data_load_state.text('')
-    load_state.text('')
+            except:
+                load_state.text (f'Information {acao} not found!')
+                percent_complete += 0.2/len(acao_list)
+                my_bar.progress(percent_complete)               
 
+        data_load_state.text('Creating graphics')
+        load_state.text('')
 
+        for i, acao in enumerate(acao_list, 1):
+            new_title = f'<p style="font-family:sans-serif; color:Green; font-size: 22px;">{acao}</p>'
+            st.markdown(new_title, unsafe_allow_html=True)        
+            st.write()
+            try: 
+                company_name = company_list[i - 1]
+                
+                plot_cufflinks(df_dict[acao], company_name)
+                percent_complete += 0.1/len(acao_list)
+                my_bar.progress(percent_complete)
+
+                plot_bubble(acao, company_name)
+                percent_complete += 0.1/len(acao_list)
+                my_bar.progress(percent_complete)
+                #plot_hist(df_dict[acao], company_name)
+
+                plot_area(df_dict[acao], company_name)
+                percent_complete += 0.1/len(acao_list)
+                my_bar.progress(percent_complete)
+
+                plot_bar(df_dict[acao], company_name)
+                percent_complete += 0.1/len(acao_list)
+                my_bar.progress(percent_complete)
+
+                plot_box(df_dict[acao], company_name)
+                percent_complete += 0.1/len(acao_list)
+                my_bar.progress(percent_complete)
+                #plot_line(df_dict[acao], company_name)        
+                #plot_candlestick(df_dict[acao], acao)
+
+                m, forecast = make_forecast(acao, period)
+                st.subheader(f'FB Prophet forecast to {acao} from {period} days')
+                fig_forecast = plot_plotly(m, forecast)
+                st.plotly_chart(fig_forecast)
+                percent_complete += 0.3/len(acao_list)
+                my_bar.progress(percent_complete)
+
+                #st.subheader(f'Explaining the characteristics of the forecast model')
+                #fig_components = m.plot_components(forecast)
+                #st.write(fig_components)
+            except:
+                load_state.text (f'Information {acao} not found!')
+                percent_complete += 0.8/len(acao_list)
+                my_bar.progress(percent_complete)
+                
+                except_title = f"<p style='font-family:sans-serif; color:Red; font-size: 12px;'>Sorry, we can't find the download information</p>"
+                st.markdown(except_title, unsafe_allow_html=True)        
+                st.write()
+                
+
+        data_load_state.text('Prediction created!')
+        #data_load_state.text('')
+        load_state.text('')
