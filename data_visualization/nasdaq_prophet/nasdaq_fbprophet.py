@@ -214,44 +214,46 @@ if run_button:
                 company_list.append(acao_company)
                 load_state.text(f'Information {acao} successfully updated!')
 
-                percent_complete += 0.2/len(acao_list)
+                percent_complete += (0.2/len(acao_list))
                 my_bar.progress(percent_complete)
 
             except:
                 load_state.text (f'Information {acao} not found!')
-                percent_complete += 0.2/len(acao_list)
+                percent_complete += (0.2/len(acao_list))
                 my_bar.progress(percent_complete)               
 
         data_load_state.text('Creating graphics')
         load_state.text('')
-
+        
         for i, acao in enumerate(acao_list, 1):
-            new_title = f'<p style="font-family:sans-serif; color:Green; font-size: 22px;">{acao}</p>'
-            st.markdown(new_title, unsafe_allow_html=True)        
-            st.write()
             try: 
                 company_name = company_list[i - 1]
+                new_title = f'<p style="font-family:sans-serif; color:Green; font-size: 22px;">{acao} - {company_name}</p>'
+                st.markdown(new_title, unsafe_allow_html=True)        
+                st.write()
                 
                 plot_cufflinks(df_dict[acao], company_name)
-                percent_complete += 0.1/len(acao_list)
+                percent_complete += (0.1/len(acao_list))
                 my_bar.progress(percent_complete)
-
+                
                 plot_bubble(acao, company_name)
-                percent_complete += 0.1/len(acao_list)
+                percent_complete += (0.1/len(acao_list))
                 my_bar.progress(percent_complete)
+                
                 #plot_hist(df_dict[acao], company_name)
 
                 plot_area(df_dict[acao], company_name)
-                percent_complete += 0.1/len(acao_list)
+                percent_complete += (0.1/len(acao_list))
                 my_bar.progress(percent_complete)
 
                 plot_bar(df_dict[acao], company_name)
-                percent_complete += 0.1/len(acao_list)
+                percent_complete += (0.1/len(acao_list))
                 my_bar.progress(percent_complete)
 
                 plot_box(df_dict[acao], company_name)
-                percent_complete += 0.1/len(acao_list)
+                percent_complete += (0.1/len(acao_list))
                 my_bar.progress(percent_complete)
+                
                 #plot_line(df_dict[acao], company_name)        
                 #plot_candlestick(df_dict[acao], acao)
 
@@ -259,22 +261,25 @@ if run_button:
                 st.subheader(f'FB Prophet forecast to {acao} from {period} days')
                 fig_forecast = plot_plotly(m, forecast)
                 st.plotly_chart(fig_forecast)
-                percent_complete += 0.3/len(acao_list)
-                my_bar.progress(percent_complete)
+                percent_complete += (0.3/len(acao_list))
+                my_bar.progress(round(percent_complete,2))
 
                 #st.subheader(f'Explaining the characteristics of the forecast model')
                 #fig_components = m.plot_components(forecast)
                 #st.write(fig_components)
             except:
-                load_state.text (f'Information {acao} not found!')
-                percent_complete += 0.8/len(acao_list)
-                my_bar.progress(percent_complete)
-                
-                except_title = f"<p style='font-family:sans-serif; color:Red; font-size: 12px;'>Sorry, we can't find the download information</p>"
-                st.markdown(except_title, unsafe_allow_html=True)        
+                new_title = f'<p style="font-family:sans-serif; color:Green; font-size: 22px;">{acao}</p>'
+                st.markdown(new_title, unsafe_allow_html=True)
                 st.write()
                 
-
+                load_state.text (f'Information {acao} not found!')
+                percent_complete += (0.8/len(acao_list))
+                my_bar.progress(round(percent_complete,2))
+                
+                except_title = f"<p style='font-family:sans-serif; color:Red; font-size: 12px;'>Sorry, we can't find the download information.</p>"
+                st.markdown(except_title, unsafe_allow_html=True)        
+                st.write()
+                    
         data_load_state.text('Prediction created!')
         #data_load_state.text('')
         load_state.text('')
