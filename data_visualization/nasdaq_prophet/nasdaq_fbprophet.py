@@ -151,7 +151,7 @@ def make_forecast(acao, period):
 
 # Side Bar #######################################################
 project_title = st.sidebar.text_input(label="Project title",
-                                      value="Forecast stok calculations")
+                                      value="Forecast stock calculations")
 
 
 
