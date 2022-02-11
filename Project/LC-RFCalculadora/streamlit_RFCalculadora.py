@@ -20,8 +20,7 @@ ntnF = RFCalculadora()
 st.set_option('deprecation.showPyplotGlobalUse', False)
 #plt.rcParams['axes.facecolor'] = 'white'
 
-# Funções ################################################################################################################
-
+# Variaveis ################################################################################################################
 
 
 # Side Bar ###############################################################################################################
@@ -41,8 +40,6 @@ run_button = st.sidebar.button(label='Execute')
 
 # BODY ###################################################################################################################
 st.title('Calculo ' + tp_calculo)
-    
-carrega_feriado = 0
 
 if run_button:
     if dt_vencimento <= dt_entrada:
@@ -55,18 +52,14 @@ if run_button:
         my_bar = st.progress(0)
         percent_complete = 0
 
-        if carrega_feriado == 0:
-            # Carrega planilha de feriados
-            caminho_arquivo = '.\\dados\\feriados_nacionais.xls'
-            load_state.text(f'Carregando planilha de Feriados {caminho_arquivo}')
-            df = ntnF.Carrega_Feriados(caminho_arquivo)
-            load_state.text(f'Carga da planilha efetuada com sucesso!')
-            percent_complete += (0.2)
-            my_bar.progress(percent_complete)
-            carrega_feriado = 1
-        else:
-            percent_complete += (0.2)
-            my_bar.progress(percent_complete)
+        # Carrega planilha de feriados
+        caminho_arquivo = 'https://www.anbima.com.br/feriados/arqs/feriados_nacionais.xls'
+        load_state.text(f'Carregando planilha de Feriados {caminho_arquivo}')
+        df = ntnF.Carrega_Feriados(caminho_arquivo)
+        load_state.text(f'Carga da planilha efetuada com sucesso!')
+        percent_complete += (0.2)
+        my_bar.progress(percent_complete)
+        carrega_feriado = 1
 
         data_load_state.text('Calculando informações...')
         load_state.text('')
@@ -83,16 +76,16 @@ if run_button:
             my_bar.progress(percent_complete)
 
             df_fluxo.rename(columns = {'Data_Entrada': 'Data Entrada', 'Data_Compra': 'Data Compra', 'Data_Pagamento': 'Data Vencimento'}, inplace = True)
-            st.write(f'Título Prefixado com juros semestrais {dt_vencimento.strftime("%Y")}')
+            st.write(f'Tesouro Prefixado com juros semestrais {dt_vencimento.strftime("%Y")}')
             st.write(f'Valor do Preço Unitário: {vl_pu_ntnf}')
             st.dataframe(df_fluxo)
             percent_complete += (0.1)
             my_bar.progress(percent_complete)
             data_load_state.text('Calculo efetuado!')
+            st.write('Observação: Caso o valor PU do título esteja divergente do site do Tesouro Direto, altere a data de entrada em D+1 ou D-1.')
             
         elif tp_calculo == "Titulos NTN-B":
-                st.write(f'A calculdora ainda não esta disponível! Estamos trabalhando nisso...')
                 my_bar.progress(100)
-                data_load_state.text('')
+                data_load_state.text('Calculadora não disponível')
         
         load_state.text('')

@@ -8,7 +8,6 @@ import math
 
 ##########################################################################################################################################
 
-
 class RFCalculadora:
     """
     Calculadora de Renda Fixa
@@ -47,13 +46,15 @@ class RFCalculadora:
     #    # cria variável (atributo) dentro do objeto
     #    self.caminho_arquivo = arquivo
 
+##########################################################################################################################################
+
     def Carrega_Feriados(self, caminho_arquivo):
         """
         Método para carregar a planilha de feriados da Anbima
         
         Parametro
             caminho_arquivo (string)
-            Definição do caminho físico da planilha de feriados nacionais do 
+            Definição do caminho da planilha de feriados nacionais do 
             padrão Anbima.
         
         Retorno
@@ -142,22 +143,28 @@ class RFCalculadora:
 
 ##########################################################################################################################################
 
-    def Calcula_Cupom(self, vl_nominal):
+# NTN-F
+# Durante o "período de vida" do título, o investidor receberá cupons semestrais que equivalem a uma taxa de 10,00% ao ano sobre o valor nominal do título (R$1.000,00).
+
+    def Calcula_Cupom(self, vl_nominal, tx_valor):
         """
         Método para calcular o valor do cupom
 
         Parametros
             vl_nominal (float): 9.9
+            
+            tx_valor (float): 9.9
+            Onde, 10 equivalem a uma taxa de 10,00 % ao ano sobre o valor nominal do título R$1.000,00, calculo NTN-F
 
         Retorno
             int
             Valor do cálculo do cupom
 
         Exemplo
-            >>> Calcula_Cupom(vl_nominal)
+            >>> Calcula_Cupom(vl_nominal, tx_valor)
         """
         try:
-            vl_cupom = round(vl_nominal * ((1 + (10/100))**(1/2) - 1), 5)
+            vl_cupom = vl_nominal * ((1 + (tx_valor/100))**(1/2) - 1)
             return vl_cupom
 
         except Exception as exception:
@@ -201,7 +208,7 @@ class RFCalculadora:
 
 ##########################################################################################################################################
 
-    def Constroi_Fluxo(self, dt_entrada, dt_vencimento, vl_nominal, tx_rendimento, D1=1):
+    def Constroi_Fluxo(self, dt_entrada, dt_vencimento, vl_nominal, tx_rendimento, tx_valor, D1=1):
         """
         Método para construção do fluxo de pagamentos 
 
@@ -219,6 +226,9 @@ class RFCalculadora:
             vl_nominal (float): 9.9
 
             tx_rendimento (float): 9.9
+            
+            tx_valor (float): 9.9
+            Onde, 10 equivalem a uma taxa de 10,00 % ao ano sobre o valor nominal do título R$1.000,00, calculo NTN-F
 
             D1 (int): 9
             Onde, 1 indica que as datas de pagamento do fluxo devem ser dias úteis;
@@ -284,8 +294,9 @@ class RFCalculadora:
                 dt_semestre = dt_semestre + relativedelta(months=n)        
 
             # Cálcula o valor do cupom 
-            vl_cupom = RFCalculadora.Calcula_Cupom(self, vl_nominal)
-
+            vl_cupom = RFCalculadora.Calcula_Cupom(self, vl_nominal, tx_valor)
+            vl_cupom = round(vl_cupom, 5)
+            
             # valor da taxa de rendimento
             tx_rendimento = round(tx_rendimento, 4)            
 
@@ -368,8 +379,10 @@ class RFCalculadora:
             dt_entrada = datetime.strptime(dt_entrada, '%d/%m/%Y').date()
             dt_vencimento = datetime.strptime(dt_vencimento, '%d/%m/%Y').date()
 
+            # A taxa é fixa 10.00 % para calculo de NTN-F
+            tx_valor = 10 
             # Calcula o valor presente dos cupons a serem recebidos
-            df_fluxo = RFCalculadora.Constroi_Fluxo(self, dt_entrada, dt_vencimento, vl_nominal, tx_rendimento, D1)        
+            df_fluxo = RFCalculadora.Constroi_Fluxo(self, dt_entrada, dt_vencimento, vl_nominal, tx_rendimento, tx_valor, D1)        
 
             # Calcula o valor presente do título (valor face)
             qt_dias_prazo = df_fluxo["Dias"].iloc[-1]
