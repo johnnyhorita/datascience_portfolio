@@ -37,6 +37,17 @@ tx_anual = st.sidebar.number_input('Rentabilidade Anual')
 
 run_button = st.sidebar.button(label='Execute')
 
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("Desenvolvido por Johnny Horita")
 
 # BODY ###################################################################################################################
 st.title('Calculo ' + tp_calculo)
@@ -76,7 +87,7 @@ if run_button:
             my_bar.progress(percent_complete)
 
             df_fluxo.rename(columns = {'Data_Entrada': 'Data Entrada', 'Data_Compra': 'Data Compra', 'Data_Pagamento': 'Data Vencimento'}, inplace = True)
-            st.write(f'Tesouro Prefixado com juros semestrais {dt_vencimento.strftime("%Y")}')
+            st.subheader(f'Tesouro Prefixado com juros semestrais {dt_vencimento.strftime("%Y")}')
             st.write(f'Valor do Preço Unitário: {vl_pu_ntnf}')
             st.dataframe(df_fluxo)
             percent_complete += (0.1)
